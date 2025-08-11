@@ -1,0 +1,314 @@
+{
+  "template_informe_seguridad": {
+    "metadata": {
+      "version": "3.1",
+      "tipo": "Informe Diario Multidimensional",
+      "descripcion": "Sistema de monitoreo integral de orden público, movilidad, clima y riesgos para la toma de decisiones estratégicas.",
+      "autor": "Unidad de Seguridad SMA",
+      "fecha_solicitud": "{{FECHA_ACTUAL}}",
+      "hora_generacion": "{{HORA_ACTUAL}}",
+      "zona_horaria": "America/Bogota",
+      "nivel_confidencialidad": "ALTO"
+    },
+    "variables_globales": {
+      "fecha_actual": "{{CURRENT_DATE}}",
+      "hora_actual": "{{CURRENT_TIME}}",
+      "anio": "{{CURRENT_YEAR}}",
+      "mes": "{{CURRENT_MONTH}}",
+      "fecha_formato": "{{CURRENT_DATE_FORMATTED}}",
+      "inicio_dia": "{{CURRENT_DATE}}T00:00:00",
+      "fin_dia": "{{CURRENT_DATE}}T23:59:59",
+      "inicio_7d": "{{CURRENT_DATE_MINUS_7DAYS}}",
+      "proxima_actualizacion": "{{CURRENT_DATETIME_PLUS_30MIN}}"
+    },
+    "configuracion_dinamica": {
+      "rango_consulta": {
+        "inicio": "{{inicio_dia}}",
+        "fin": "{{fin_dia}}"
+      },
+      "actualizacion_automatica": {
+        "intervalo": "30_minutos",
+        "proxima_actualizacion": "{{proxima_actualizacion}}"
+      }
+    },
+    "dimensiones_analisis": {
+      "1_recopilacion_noticias": {
+        "descripcion": "Recopila y clasifica noticias de orden público según categoría, ubicación e impacto.",
+        "activa": true,
+        "estado": "pendiente",
+        "prioridad": "ALTA",
+        "categorias": [
+          "seguridad",
+          "movilidad",
+          "infraestructura",
+          "eventos_sociales"
+        ],
+        "fuentes": {
+          "oficiales": [
+            "@PoliciaColombia",
+            "@MinTransporte",
+            "@InviasColombia"
+          ],
+          "medios": [
+            "eltiempo.com",
+            "rcnradio.com",
+            "elespectador.com"
+          ],
+          "apis": [
+            "newsapi.org",
+            "rss_feeds",
+            "twitter_api"
+          ]
+        },
+        "filtros": {
+          "fecha": "{{fecha_actual}}",
+          "ubicacion": "nacional",
+          "impacto": "alto"
+        },
+        "verificacion": {
+          "min_fuentes_independientes": 2,
+          "usar_confidence": true,
+          "umbral_confianza": 0.75
+        },
+        "output_fields": [
+          "titulo",
+          "descripcion",
+          "categoria",
+          "ubicacion",
+          "lat",
+          "lon",
+          "fuente",
+          "impacto",
+          "confianza"
+        ],
+        "criticidad_evento": {
+          "bajo": [
+            "evento menor",
+            "sin afectación"
+          ],
+          "medio": [
+            "afectación parcial",
+            "riesgo moderado"
+          ],
+          "alto": [
+            "bloqueo",
+            "ataque",
+            "riesgo alto"
+          ],
+          "critico": [
+            "explosión",
+            "muerto",
+            "herido",
+            "atentado"
+          ]
+        }
+      },
+      "2_graficos_estadisticos": {
+        "descripcion": "Genera visualizaciones de tendencias, mapas y distribución horaria de eventos.",
+        "estado": "pendiente",
+        "plantillas": [
+          "tendencias_7_dias",
+          "heatmap_geografico",
+          "barras_horarias"
+        ],
+        "rango_datos": {
+          "inicio": "{{inicio_7d}}",
+          "fin": "{{fecha_actual}}"
+        }
+      },
+      "3_dashboard_powerbi": {
+        "descripcion": "Alimenta dashboard en Power BI con KPIs y visualizaciones clave.",
+        "estado": "pendiente",
+        "workspace_id": "workspace_seguridad_{{anio}}",
+        "dataset_name": "Seguridad_Diaria_{{fecha_formato}}",
+        "refresh_schedule": {
+          "enabled": true,
+          "times": [
+            "06:00",
+            "14:00",
+            "20:00"
+          ],
+          "timezone": "America/Bogota"
+        },
+        "widgets": [
+          {
+            "id": "contador_incidentes",
+            "type": "kpi_card",
+            "data_source": "incidentes_{{fecha_actual}}"
+          },
+          {
+            "id": "mapa_calor",
+            "type": "heatmap",
+            "data_source": "coordenadas_{{fecha_actual}}"
+          }
+        ]
+      },
+      "4_matriz_riesgos": {
+        "descripcion": "Calcula niveles de riesgo combinando probabilidad e impacto.",
+        "estado": "pendiente",
+        "calculo_automatico": true,
+        "parametros": {
+          "probabilidad": {
+            "baja": "1-2",
+            "media": "3",
+            "alta": "4-5"
+          },
+          "impacto": {
+            "bajo": "1-2",
+            "medio": "3",
+            "alto": "4",
+            "critico": "5"
+          }
+        },
+        "amenazas_base": [
+          "manifestaciones",
+          "bloqueos_viales",
+          "condiciones_climaticas",
+          "delitos_viales",
+          "emergencias_medicas"
+        ],
+        "salida": {
+          "formula": "probabilidad * impacto",
+          "niveles": {
+            "bajo": [
+              1,
+              4
+            ],
+            "medio": [
+              5,
+              9
+            ],
+            "alto": [
+              10,
+              14
+            ],
+            "critico": [
+              15,
+              25
+            ]
+          }
+        }
+      },
+      "5_analisis_meteorologico": {
+        "descripcion": "Monitorea condiciones climáticas en zonas estratégicas.",
+        "estado": "pendiente",
+        "api_endpoint": "https://api.openweathermap.org/data/2.5/onecall",
+        "ubicaciones": [
+          {
+            "nombre": "Bogotá",
+            "lat": 4.711,
+            "lon": -74.0721
+          },
+          {
+            "nombre": "Yopal",
+            "lat": 5.3378,
+            "lon": -72.3959
+          },
+          {
+            "nombre": "Medellín",
+            "lat": 6.2442,
+            "lon": -75.5812
+          }
+        ],
+        "parametros": [
+          "precipitacion",
+          "visibilidad",
+          "temperatura",
+          "viento"
+        ],
+        "alertas": {
+          "naranja": "precipitacion > 70% en 3 horas",
+          "roja": "precipitacion > 85% en 6 horas"
+        }
+      },
+      "6_estado_vias": {
+        "descripcion": "Evalúa operatividad vial y tiempos de traslado.",
+        "estado": "pendiente",
+        "fuentes": {
+          "waze": "connected_citizens",
+          "google": "maps_platform",
+          "invias": "road_conditions"
+        },
+        "metricas": [
+          "porcentaje_operatividad",
+          "tiempo_promedio_traslado",
+          "incidentes_reportados"
+        ]
+      },
+      "7_monitoreo_bloqueos": {
+        "descripcion": "Detecta bloqueos y paros en tiempo real.",
+        "estado": "pendiente",
+        "canales": {
+          "twitter": [
+            "@PoliciaBogota",
+            "@TransitoBta"
+          ],
+          "waze": "live_alerts",
+          "radio": [
+            "RcnRadio",
+            "LaFM"
+          ]
+        },
+        "zonas_monitoreo": [
+          "centro_urbano",
+          "autopista_norte",
+          "autopista_sur",
+          "calle_80",
+          "avenida_caracas"
+        ],
+        "reglas_alerta": {
+          "palabras_clave": [
+            "atentado",
+            "explosion",
+            "muerto",
+            "herido",
+            "ataque",
+            "bloqueo",
+            "paro"
+          ],
+          "nivel_alerta": {
+            "critico": [
+              "atentado",
+              "explosion",
+              "muerto",
+              "herido"
+            ],
+            "alto": [
+              "bloqueo",
+              "paro",
+              "ataque"
+            ]
+          },
+          "min_confianza": 0.75
+        }
+      }
+    },
+    "salidas_automaticas": {
+      "formatos": [
+        "pdf",
+        "excel",
+        "json"
+      ],
+      "distribucion": {
+        "email": [
+          "edgar.diaz@smaingenieros.com.co"
+        ],
+        "sharepoint": "/sites/Seguridad/Informes/{{anio}}/{{mes}}",
+        "teams": "canal_seguridad_diaria"
+      },
+      "nomenclatura": "INFO_SEG_{{fecha_formato}}_{{hora_actual}}"
+    },
+    "auditoria": {
+      "ultima_ejecucion": "{{fecha_actual}} {{hora_actual}}",
+      "ejecutado_por": "Sistema Automatizado SMA",
+      "ultima_validacion_humana": null,
+      "historial_ejecuciones": []
+    },
+    "validaciones": {
+      "fechas_futuras": false,
+      "rango_maximo": 30,
+      "alertas_duplicadas": true,
+      "fuentes_offline": "usar_cache_ultimas_24h"
+    }
+  }
+}
