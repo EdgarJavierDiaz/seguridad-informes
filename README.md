@@ -1,7 +1,7 @@
 # 📊 Informe Diario Multidimensional de Seguridad
 
 **Versión:** 3.1  
-**Autor:** Unidad de Seguridad SMA  
+**Autor:** Analista de Seguridad SMA  
 **Confidencialidad:** ALTO  
 **Última actualización:** {{FECHA_ACTUAL}} {{HORA_ACTUAL}}  
 
